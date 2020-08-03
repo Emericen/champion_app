@@ -8,13 +8,33 @@ class Loading extends StatefulWidget {
 }
 
 class _LoadingState extends State<Loading> {
+
+  void connectToServer() async {
+    Database connection = await Database();
+    await new Future.delayed(const Duration(seconds : 1));
+    Navigator.pushReplacementNamed(context, '/welcome', arguments: {
+      'connection': connection,
+    });
+
+//    Navigator.pushNamed(context, '/welcome');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    connectToServer();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        Container(color: Colors.redAccent,),
-        Container(color:Colors.red[400])
-      ],
+    return Scaffold(
+      body: Center(
+        child: SpinKitFadingCircle(
+          color: Colors.green,
+          size: 70,
+        )
+      ),
+
     );
   }
 }

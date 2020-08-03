@@ -110,7 +110,7 @@ class _RegisterState extends State<Register> {
                             color: Colors.green,
                             onPressed: () {
                               if (_formKey.currentState.validate()) {
-                                print('$username signed up with password $password');
+//                                print('$username signed up with password $password');
 
 
                               }

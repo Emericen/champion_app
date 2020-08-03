@@ -9,7 +9,22 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Container(
+          color: Colors.white,
+          alignment: Alignment.center,
+          child: Text(
+            'Hello there!',
+            style: TextStyle(
+              fontSize: 35,
+              color: Colors.black,
+            )
+          ),
+        ),
+      ),
+    );
   }
 }
 
