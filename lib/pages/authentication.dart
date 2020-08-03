@@ -13,16 +13,20 @@ class _SignInState extends State<SignIn> {
   Color background = Colors.white;
 
   final _formKey = GlobalKey<FormState>();
+  Map data = {};
+  Database connection;
 
   String username = '';
   String password = '';
 
   bool showErrorText = false;
 
-  int topFlex = 3;
+  int topFlex = 2;
+  int welcomeFlex = 2;
+  int warningFlex = 1;
   int textBoxFlex = 2;
   int buttonFlex = 1;
-  int warningFlex = 1;
+  int registerFlex = 2;
   int bottomFlex = 9;
 
   void enableErrorText() {
@@ -33,6 +37,9 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
+    data = data.isNotEmpty? data : ModalRoute.of(context).settings.arguments;
+    connection = data['connection'];
+
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       backgroundColor: background,
@@ -49,6 +56,35 @@ class _SignInState extends State<SignIn> {
                     flex: topFlex,
                     child: Container(),
                   ), // TOP
+                  Expanded(
+                    flex: welcomeFlex,
+                    child: Container(
+                      child: Center(
+                        child: Text(
+                          'Welcome',
+                          style: TextStyle(
+                              fontSize: 35
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: warningFlex,
+                    child: Visibility(
+                      visible: showErrorText,
+                      child: Center(
+                        child:Text(
+                          'Username or password incorrect',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   Expanded(
                     flex: textBoxFlex,
                     child: Container(
@@ -104,16 +140,20 @@ class _SignInState extends State<SignIn> {
                     ),
                   ), // BUTTON
                   Expanded(
-                    flex: warningFlex,
-                    child: Visibility(
-                      visible: showErrorText,
-                      child: Center(
-                        child:Text(
-                          'Username or password incorrect',
-                          textAlign: TextAlign.center,
+                    flex: registerFlex,
+                    child: Container(
+                      child: FlatButton(
+                        color: Colors.white,
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(context, '/register', arguments: {
+                            'connection': connection,
+                          });
+                        },
+                        child: Text(
+                          "Don't have an account? Sign up.",
                           style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.red,
+                            fontSize: 16,
+                            decoration: TextDecoration.underline,
                           ),
                         ),
                       ),

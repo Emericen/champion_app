@@ -12,11 +12,9 @@ class _LoadingState extends State<Loading> {
   void connectToServer() async {
     Database connection = await Database();
     await new Future.delayed(const Duration(seconds : 1));
-    Navigator.pushReplacementNamed(context, '/welcome', arguments: {
+    Navigator.pushReplacementNamed(context, '/signin', arguments: {
       'connection': connection,
     });
-
-//    Navigator.pushNamed(context, '/welcome');
   }
 
   @override
@@ -34,7 +32,6 @@ class _LoadingState extends State<Loading> {
           size: 70,
         )
       ),
-
     );
   }
 }

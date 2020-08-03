@@ -12,6 +12,9 @@ class _RegisterState extends State<Register> {
 
   final _formKey = GlobalKey<FormState>();
 
+  Map data = {};
+  Database connection;
+
   String username = '';
   String firstPassword = '';
   String password = '';
@@ -22,6 +25,7 @@ class _RegisterState extends State<Register> {
   int textBoxFlex = 2;
   int buttonFlex = 1;
   int warningFlex = 1;
+  int authenticationFlex = 1;
   int bottomFlex = 8;
 
   void enableErrorText() {
@@ -32,6 +36,8 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
+    data = data.isNotEmpty? data : ModalRoute.of(context).settings.arguments;
+    connection = data['connection'];
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       backgroundColor: background,
@@ -126,11 +132,32 @@ class _RegisterState extends State<Register> {
                       visible: showErrorText,
                       child: Center(
                         child:Text(
-                          'Username or password incorrect',
+                          'Username already exist.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 20,
                             color: Colors.red,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: authenticationFlex,
+                    child: Container(
+                      color: Colors.green,
+                      child: FlatButton(
+                        color: Colors.white,
+                        onPressed: () {
+                          Navigator.pushReplacementNamed(context, '/signin', arguments: {
+                            'connection': connection,
+                          });
+                        },
+                        child: Text(
+                          "Already have an account? Log in.",
+                          style: TextStyle(
+                            fontSize: 16,
+                            decoration: TextDecoration.underline,
                           ),
                         ),
                       ),

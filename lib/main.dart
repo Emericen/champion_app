@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:champion_app/pages/welcome.dart';
 import 'package:champion_app/pages/loading.dart';
 import 'package:champion_app/pages/register.dart';
 import 'package:champion_app/pages/authentication.dart';
@@ -10,7 +9,6 @@ void main() {
     initialRoute: '/',
     routes:{
       '/': (context) => Loading(),
-      '/welcome': (context) => WelcomePage(),
       '/register': (context) => Register(),
       '/signin': (context) => SignIn(),
       '/home': (context) => Home(),
