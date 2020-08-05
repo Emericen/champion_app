@@ -89,8 +89,10 @@ class _RegisterState extends State<Register> {
                       validator: (value) {
                         if (value.isEmpty)
                           return 'Please enter password';
+                        firstPassword = value;
                         return null;
                       },
+                      obscureText: true,
                     ),
                   ),
                 ),
@@ -106,9 +108,12 @@ class _RegisterState extends State<Register> {
                       validator: (value) {
                         if (value.isEmpty)
                           return 'Please confirm password';
+                        else if(value != firstPassword)
+                          return 'Confirmation password must be the same.';
                         password = value;
                         return null;
                       },
+                      obscureText: true,
                     ),
                   ),
                 ),
@@ -148,7 +153,7 @@ class _RegisterState extends State<Register> {
                         decoration: TextDecoration.underline,
                       ),
                     ),
-                  )
+                  ),
                 ),
               ],
             ),

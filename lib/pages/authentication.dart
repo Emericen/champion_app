@@ -7,7 +7,7 @@ class SignIn extends StatefulWidget {
 }
 
 class _SignInState extends State<SignIn> {
-  
+
   Map size = {
     'welcome_w':0.8,
     'welcome_h':0.15,
