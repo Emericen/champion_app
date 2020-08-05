@@ -26,6 +26,7 @@ class _LoadingState extends State<Loading> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       body: Center(
         child: SpinKitFadingCircle(
           color: Colors.green,

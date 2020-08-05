@@ -8,25 +8,31 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
 
-  Color background = Colors.white;
-
-  final _formKey = GlobalKey<FormState>();
-
   Map data = {};
   Database connection;
 
+  final _formKey = GlobalKey<FormState>();
   String username = '';
   String firstPassword = '';
   String password = '';
-
   bool showErrorText = false;
 
-  int topFlex = 3;
-  int textBoxFlex = 2;
-  int buttonFlex = 1;
-  int warningFlex = 1;
-  int authenticationFlex = 1;
-  int bottomFlex = 8;
+  Map size = {
+    'top_h':0.075,
+
+    'text_w':0.8,
+    'text_h':0.085,
+    'space_h':0.025,
+
+    'submit_w':0.6,
+    'submit_h':0.07,
+    'submit_f':25.0,
+
+    'authentication_w':0.8,
+    'authentication_h':0.07,
+    'authentication_f':16.0
+  };
+
 
   void enableErrorText() {
     setState(() {
@@ -36,139 +42,115 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
+
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+
     data = data.isNotEmpty? data : ModalRoute.of(context).settings.arguments;
     connection = data['connection'];
+
     return Scaffold(
       resizeToAvoidBottomPadding: false,
-      backgroundColor: background,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Form(
           key: _formKey,
           child: Container(
             alignment: Alignment.center,
-            child: FractionallySizedBox(
-              widthFactor: 0.8,
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                    flex: topFlex,
-                    child: Container(),
-                  ), // TOP
-                  Expanded(
-                    flex: textBoxFlex,
-                    child: Container(
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          hintText: 'Enter username',
-                        ),
-                        validator: (value) {
-                          if (value.isEmpty)
-                            return 'Please enter username';
-                          username = value;
-                          return null;
-                        },
+            child: Column(
+              children: <Widget>[
+                SizedBox(height:size['top_h'] * height),
+                Container(
+                  width: size['text_w'] * width,
+                  height: size['text_h'] * height,
+                  child: Center(
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        hintText: 'Enter username',
                       ),
+                      validator: (value) {
+                        if (value.isEmpty)
+                          return 'Please enter username';
+                        username = value;
+                        return null;
+                      },
                     ),
-                  ), // USERNAME
-                  Expanded(
-                    flex: textBoxFlex,
-                    child: Container(
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          hintText: 'Enter password',
-                        ),
-                        validator: (value) {
-                          if (value.isEmpty)
-                            return 'Please enter password';
-                          firstPassword = value;
-                          return null;
-                        },
-                        obscureText: true,
+                  ),
+                ),
+                SizedBox(height:size['space_h'] * height),
+                Container(
+                  width: size['text_w'] * width,
+                  height: size['text_h'] * height,
+                  child: Center(
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        hintText: 'Enter password',
                       ),
+                      validator: (value) {
+                        if (value.isEmpty)
+                          return 'Please enter password';
+                        return null;
+                      },
                     ),
-                  ), // PASSWORD
-                  Expanded(
-                    flex: textBoxFlex,
-                    child: Container(
-                      child: TextFormField(
-                        decoration: const InputDecoration(
-                          hintText: 'Confirm password',
-                        ),
-                        validator: (value) {
-                          if (value.isEmpty)
-                            return 'Please confirm password';
-                          else if (value != firstPassword)
-                            return 'Please enter the same password';
-                          password = value;
-                          return null;
-                        },
-                        obscureText: true,
+                  ),
+                ),
+                SizedBox(height:size['space_h'] * height),
+                Container(
+                  width: size['text_w'] * width,
+                  height: size['text_h'] * height,
+                  child: Center(
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        hintText: 'Confirm password',
+                      ),
+                      validator: (value) {
+                        if (value.isEmpty)
+                          return 'Please confirm password';
+                        password = value;
+                        return null;
+                      },
+                    ),
+                  ),
+                ),
+                SizedBox(height:size['space_h'] * height),
+                Container(
+                  width: size['submit_w'] * width,
+                  height: size['submit_h'] * height,
+                  child: RaisedButton(
+                    color: Colors.green,
+                    onPressed: () {
+                      if (_formKey.currentState.validate()) {
+                        print('$username registered with password $password');
+                      }
+                    },
+                    child: Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        fontSize: size['submit_f'],
                       ),
                     ),
                   ),
-                  Expanded(
-                    flex: buttonFlex,
-                    child: Container(
-                      color: Colors.amber,  // for visualization, remove upon finish
-                      child: FractionallySizedBox(
-                          widthFactor: 0.7,
-                          child: RaisedButton(
-                            color: Colors.green,
-                            onPressed: () {
-                              if (_formKey.currentState.validate()) {
-//                                print('$username signed up with password $password');
-
-
-                              }
-                            },
-                            child: Text('Sign Up'),
-                          )
+                ),
+                Container(
+                  width: size['authentication_w'] * width,
+                  height: size['authentication_h'] * height,
+                  child: FlatButton(
+                    color: Colors.white,
+                    onPressed: () {
+                      Navigator.pushReplacementNamed(context, '/signin', arguments: {
+                        'connection': connection,
+                      });
+                    },
+                    child: Text(
+                      "Already have an account? Log in.",
+                      style: TextStyle(
+                        fontSize: size['authentication_f'],
+                        decoration: TextDecoration.underline,
                       ),
                     ),
-                  ), // BUTTON
-                  Expanded(
-                    flex: warningFlex,
-                    child: Visibility(
-                      visible: showErrorText,
-                      child: Center(
-                        child:Text(
-                          'Username already exist.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.red,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: authenticationFlex,
-                    child: Container(
-                      color: Colors.green,
-                      child: FlatButton(
-                        color: Colors.white,
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(context, '/signin', arguments: {
-                            'connection': connection,
-                          });
-                        },
-                        child: Text(
-                          "Already have an account? Log in.",
-                          style: TextStyle(
-                            fontSize: 16,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: bottomFlex,
-                    child: Container(),
-                  ), // BOTTOM
-                ],
-              ),
+                  )
+                ),
+              ],
             ),
           ),
         ),
