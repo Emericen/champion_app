@@ -4,8 +4,6 @@ import 'package:champion_app/pages/register.dart';
 import 'package:champion_app/pages/authentication.dart';
 import 'package:champion_app/pages/home.dart';
 import 'package:champion_app/pages/selection.dart';
-import 'package:champion_app/test.dart';
-import 'package:champion_app/services/database.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -18,6 +16,7 @@ void main() {
       '/selection': (context) => Selection(),
     },
   ));
+
 
 //  Map a = {'username': 'eddy', 'owned': ['a', 'b', 'c']};
 //  print(a);

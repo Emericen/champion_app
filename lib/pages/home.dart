@@ -31,14 +31,23 @@ class _HomeState extends State<Home> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.green,
-        title: connection.currentUser['username'],
+        title: Text(connection.currentUser['username']),
         centerTitle: true,
         elevation:0,
+        leading: IconButton(
+          icon: const Icon(Icons.navigate_before),
+          onPressed: () {
+            connection.logout();
+            Navigator.pushReplacementNamed(context, '/signin', arguments: {
+              'connection': data['connection']
+            });
+          }
+        ),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              Navigator.pushNamed(context, '/selection', arguments: {
+              Navigator.pushReplacementNamed(context, '/selection', arguments: {
                 'connection': data['connection']
               });
             },
@@ -92,7 +101,6 @@ class _HomeState extends State<Home> {
               // show loading
               return Center(
                 child: Container(
-                  color: Colors.red,
                   alignment: Alignment.center,
                   child: SpinKitFadingCircle(
                     color: Colors.green,

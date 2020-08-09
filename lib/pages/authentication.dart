@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:champion_app/services/database.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class SignIn extends StatefulWidget {
   @override
@@ -8,17 +10,10 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
 
-  double width;
-  double height;
-
   Map size = {
     'welcome_w':0.8,
-    'welcome_h':0.065,
+    'welcome_h':0.15,
     'welcome_f':30.0,
-
-    'error_w': 0.8,
-    'error_h': 0.085,
-    'error_f':20.0,
 
     'text_w':0.8,
     'text_h':0.085,
@@ -40,20 +35,42 @@ class _SignInState extends State<SignIn> {
 
   String username = '';
   String password = '';
-  bool showErrorText = false;
 
-  void enableErrorText() {
-    setState(() {
-      showErrorText = true;
+  bool showLoading = false;
+
+
+  void toggleLoadingIcon() {
+    setState((){
+      showLoading = !showLoading;
     });
+  }
+
+  Future<void> _showErrorDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('Incorrect username or password'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Return'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      }
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     data = data.isNotEmpty? data : ModalRoute.of(context).settings.arguments;
     connection = data['connection'];
-    width = MediaQuery.of(context).size.width;
-    height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       resizeToAvoidBottomPadding: false,
@@ -67,7 +84,7 @@ class _SignInState extends State<SignIn> {
               children: <Widget>[
                 SizedBox(height: size['space_h'] * height),
                 Container(
-                  width: size['welcome_w'] * width,
+                  width: size['welcome_w']* width,
                   height: size['welcome_h'] * height,
                   child: Center(
                     child: Text(
@@ -78,22 +95,6 @@ class _SignInState extends State<SignIn> {
                     ),
                   ),
                 ), // welcome text
-                Container(
-                  width: size['error_w'] * width,
-                  height: size['error_h'] * height,
-                  child: Visibility(
-                    visible: showErrorText,
-                    child: Center(
-                      child: Text(
-                        'Incorrect username or password',
-                        style: TextStyle(
-                          fontSize: size['error_f'],
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
-                  ),
-                ), // error text
                 Container(
                   width: size['text_w'] * width,
                   height: size['text_h'] * height,
@@ -138,23 +139,41 @@ class _SignInState extends State<SignIn> {
                     color: Colors.green,
                     onPressed: () async {
                       if (_formKey.currentState.validate()) {
+                        toggleLoadingIcon();
                         bool result = await connection.login(username, password);
                         if (!result) {
-                          enableErrorText();
+                          toggleLoadingIcon();
+                          _showErrorDialog();
                         }
                         else if (result) {
+                          toggleLoadingIcon();
                           Navigator.pushReplacementNamed(context, '/home', arguments: {
                             'connection': connection
                           });
                         }
                       }
                     },
-                    child: Text(
-                      'Log In',
-                      style: TextStyle(
-                        fontSize: size['submit_f'],
-                      ),
-                    ),
+                    child: Stack(
+                      children: <Widget>[
+                        Visibility(
+                          visible: !showLoading,
+                          child: Text(
+                            'Log In',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: size['submit_f'],
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: showLoading,
+                          child: SpinKitFadingCircle(
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        ),
+                      ],
+                    )
                   ),
                 ), // submit button
                 Container(

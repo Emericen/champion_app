@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:champion_app/services/database.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -15,7 +17,6 @@ class _RegisterState extends State<Register> {
   String username = '';
   String firstPassword = '';
   String password = '';
-  bool showErrorText = false;
 
   Map size = {
     'top_h':0.075,
@@ -33,11 +34,33 @@ class _RegisterState extends State<Register> {
     'authentication_f':16.0
   };
 
+  bool showLoadingIcon = false;
 
-  void enableErrorText() {
+
+  void toggleLoadingIcon() {
     setState(() {
-      showErrorText = true;
+      showLoadingIcon = !showLoadingIcon;
     });
+  }
+
+  Future<void> _showErrorDialog() async {
+    return showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text('Username taken, pick another username.'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Return'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        }
+    );
   }
 
   @override
@@ -123,16 +146,42 @@ class _RegisterState extends State<Register> {
                   height: size['submit_h'] * height,
                   child: RaisedButton(
                     color: Colors.green,
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState.validate()) {
-                        print('$username registered with password $password');
+                        toggleLoadingIcon();
+                        bool result = await connection.registerUser(username, password);
+                        if (result) {
+                          await connection.login(username, password);
+                          toggleLoadingIcon();
+                          Navigator.pushReplacementNamed(context, '/home', arguments: {
+                            'connection': connection
+                          });
+                        } else {
+                          toggleLoadingIcon();
+                          _showErrorDialog();
+                        }
                       }
                     },
-                    child: Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        fontSize: size['submit_f'],
-                      ),
+                    child: Stack(
+                      children: <Widget>[
+                        Visibility(
+                          visible: !showLoadingIcon,
+                          child: Text(
+                            'Sign Up',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: size['submit_f'],
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: showLoadingIcon,
+                          child: SpinKitFadingCircle(
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        )
+                      ],
                     ),
                   ),
                 ), // submit button

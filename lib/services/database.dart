@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import '../classes/champion.dart';
 import 'package:leancloud_storage/leancloud.dart';
@@ -17,12 +16,18 @@ class Database {
     );
   }
 
-  void registerUser(String username, String password) async {
-    LCObject newUser = LCObject('Player');
-    newUser['username'] = username;
-    newUser['password'] = password;
-    await newUser.save();
-    print('registered user $username');
+  Future<bool> registerUser(String username, String password) async {
+    LCObject userWithThisUsername = await _getUser(username);
+    if (userWithThisUsername == null){
+      LCObject newUser = LCObject('Player');
+      newUser['username'] = username;
+      newUser['password'] = password;
+      await newUser.save();
+      print('registered user $username');
+      return true;
+    } else {
+      return false;
+    }
   }
 
 
@@ -78,8 +83,27 @@ class Database {
   }
 
   Future<List<Champion>> getUnowned() async {
+    List<String> allId = await _getAllChampionId();
+    List<Champion> owned = await getOwned();
+    List<String> ownedId = [];
+    for (Champion entry in owned)
+      ownedId.add(entry.objectId);
+    List<String> resultId = [];
+    for (String entry in allId) {
+      if(!ownedId.contains(entry)) {
+        resultId.add(entry);
+      }
+    }
+    LCQuery<LCObject> query = LCQuery('Champion');
     List<Champion> result = [];
-
+    for (String id in resultId) {
+      LCObject champion = await query.get(id);
+      result.add(Champion(
+        objectId: id,
+        name: champion['Name'],
+        thumbnail: NetworkImage(champion['Thumbnail'].url)
+      ));
+    }
     return result;
   }
 
@@ -100,16 +124,15 @@ class Database {
       return result[0];
   }
 
-  Future<LCObject> _getChampion(String championName) async {
+  Future<List<String>> _getAllChampionId() async {
     LCQuery championQuery = LCQuery('Champion');
-    championQuery.whereEqualTo('Name', championName);
-    List<LCObject> result = await championQuery.find();
-    if (result.length == 0)
-      return null;
-    else
-      return result[0];
+    List<LCObject> queryResult = await championQuery.find();
+    List<String> result = [];
+    for (LCObject entry in queryResult) {
+      result.add(_getObjectId(entry));
+    }
+    return result;
   }
-
 }
 
 
