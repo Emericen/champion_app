@@ -3,6 +3,9 @@ import 'package:champion_app/pages/loading.dart';
 import 'package:champion_app/pages/register.dart';
 import 'package:champion_app/pages/authentication.dart';
 import 'package:champion_app/pages/home.dart';
+import 'package:champion_app/pages/selection.dart';
+import 'package:champion_app/test.dart';
+import 'package:champion_app/services/database.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -12,12 +15,16 @@ void main() {
       '/register': (context) => Register(),
       '/signin': (context) => SignIn(),
       '/home': (context) => Home(),
-
+      '/selection': (context) => Selection(),
     },
   ));
 
+//  Map a = {'username': 'eddy', 'owned': ['a', 'b', 'c']};
+//  print(a);
+
 //  print("start");
 //  Database connection = Database();
+//  connection.updateChampionAssets();
 //  List<String> ownedChampions = [];
 //
 //  await connection.registerUser('positino', '680822dd');

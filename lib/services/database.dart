@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/material.dart';
+import '../classes/champion.dart';
 import 'package:leancloud_storage/leancloud.dart';
-
 
 class Database {
 
@@ -23,16 +25,17 @@ class Database {
     print('registered user $username');
   }
 
-  void login(String username, String password) async {
+
+  Future<bool> login(String username, String password) async {
     LCObject user = await _getUser(username);
     if (user != null) {
       if (user['password'] == password) {
         currentUser = user;
-        print('logged in $username');
-        return;
+        return true;
       }
+      return false;
     }
-    print('Wrong username or password!');
+    return false;
   }
 
   void logout() async {
@@ -40,20 +43,6 @@ class Database {
     currentUser = null;
     print('logged out $username.');
   }
-
-//  void ownChampion(String championName) async {
-//    if (currentUser != null) {
-//      LCObject champion = await _getChampion(championName);
-//      LCObject newOwnerShip = LCObject('Ownership');
-//      newOwnerShip['userId'] = _getObjectId(currentUser);
-//      newOwnerShip['championId'] = _getObjectId(champion);
-//      await newOwnerShip.save();
-//      print('${currentUser['username']} owned ${champion['Name']}');
-//    } else {
-//      print('error: please log in a user first.');
-//      return;
-//    }
-//  }
 
   // pre-req: championId must be in champions list.
   void ownChampion(String championId) async {
@@ -68,17 +57,30 @@ class Database {
     }
   }
 
-  Future<List<String>> getOwned() async {
+  Future<List<Champion>> getOwned() async {
     LCQuery championQuery = LCQuery('Champion');
     LCQuery ownershipQuery = LCQuery('Ownership');
-    List<String> listOfNames = [];
+    List<Champion> result = [];
+
     ownershipQuery.whereEqualTo('userId', _getObjectId(currentUser));
-    List<LCObject> result = await ownershipQuery.find();
-    for (LCObject ownership in result) {
+    List<LCObject> queryResult = await ownershipQuery.find();
+    for (LCObject ownership in queryResult) {
       LCObject champion = await championQuery.get(ownership['championId']);
-      listOfNames.add(champion['Name']);
+      result.add(
+        Champion(
+          objectId: ownership['championId'],
+          name: champion['Name'],
+          thumbnail: NetworkImage(champion['Thumbnail'].url),
+        ),
+      );
     }
-    return listOfNames;
+    return result;
+  }
+
+  Future<List<Champion>> getUnowned() async {
+    List<Champion> result = [];
+
+    return result;
   }
 
 

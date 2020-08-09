@@ -76,7 +76,7 @@ class _RegisterState extends State<Register> {
                       },
                     ),
                   ),
-                ),
+                ), // username input
                 SizedBox(height:size['space_h'] * height),
                 Container(
                   width: size['text_w'] * width,
@@ -95,7 +95,7 @@ class _RegisterState extends State<Register> {
                       obscureText: true,
                     ),
                   ),
-                ),
+                ), // password input
                 SizedBox(height:size['space_h'] * height),
                 Container(
                   width: size['text_w'] * width,
@@ -116,7 +116,7 @@ class _RegisterState extends State<Register> {
                       obscureText: true,
                     ),
                   ),
-                ),
+                ), // confirm password input
                 SizedBox(height:size['space_h'] * height),
                 Container(
                   width: size['submit_w'] * width,
@@ -135,7 +135,7 @@ class _RegisterState extends State<Register> {
                       ),
                     ),
                   ),
-                ),
+                ), // submit button
                 Container(
                   width: size['authentication_w'] * width,
                   height: size['authentication_h'] * height,
@@ -154,7 +154,7 @@ class _RegisterState extends State<Register> {
                       ),
                     ),
                   ),
-                ),
+                ), // log in switch
               ],
             ),
           ),

@@ -8,12 +8,11 @@ class Loading extends StatefulWidget {
 }
 
 class _LoadingState extends State<Loading> {
-
   void connectToServer() async {
     Database connection = await Database();
     await new Future.delayed(const Duration(seconds : 1));
     Navigator.pushReplacementNamed(context, '/signin', arguments: {
-      'connection': connection,
+      'connection': connection
     });
   }
 

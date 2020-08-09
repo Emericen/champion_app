@@ -8,10 +8,17 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
 
+  double width;
+  double height;
+
   Map size = {
     'welcome_w':0.8,
-    'welcome_h':0.15,
+    'welcome_h':0.065,
     'welcome_f':30.0,
+
+    'error_w': 0.8,
+    'error_h': 0.085,
+    'error_f':20.0,
 
     'text_w':0.8,
     'text_h':0.085,
@@ -24,7 +31,7 @@ class _SignInState extends State<SignIn> {
 
     'register_w':0.8,
     'register_h':0.07,
-    'register_f':16.0
+    'register_f':16.0,
   };
 
   Map data = {};
@@ -45,9 +52,8 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     data = data.isNotEmpty? data : ModalRoute.of(context).settings.arguments;
     connection = data['connection'];
-
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    width = MediaQuery.of(context).size.width;
+    height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       resizeToAvoidBottomPadding: false,
@@ -71,7 +77,23 @@ class _SignInState extends State<SignIn> {
                       ),
                     ),
                   ),
-                ),
+                ), // welcome text
+                Container(
+                  width: size['error_w'] * width,
+                  height: size['error_h'] * height,
+                  child: Visibility(
+                    visible: showErrorText,
+                    child: Center(
+                      child: Text(
+                        'Incorrect username or password',
+                        style: TextStyle(
+                          fontSize: size['error_f'],
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ),
+                ), // error text
                 Container(
                   width: size['text_w'] * width,
                   height: size['text_h'] * height,
@@ -88,7 +110,7 @@ class _SignInState extends State<SignIn> {
                       },
                     ),
                   ),
-                ),
+                ), // username input
                 SizedBox(height: size['space_h'] * height),
                 Container(
                   width: size['text_w'] * width,
@@ -107,16 +129,24 @@ class _SignInState extends State<SignIn> {
                       obscureText: true,
                     ),
                   ),
-                ),
+                ), // password input
                 SizedBox(height: size['space_h'] * height),
                 Container(
                   width: size['submit_w'] * width,
                   height: size['submit_h'] * height,
                   child: RaisedButton(
                     color: Colors.green,
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState.validate()) {
-                        print('$username logged in with password $password');
+                        bool result = await connection.login(username, password);
+                        if (!result) {
+                          enableErrorText();
+                        }
+                        else if (result) {
+                          Navigator.pushReplacementNamed(context, '/home', arguments: {
+                            'connection': connection
+                          });
+                        }
                       }
                     },
                     child: Text(
@@ -126,7 +156,7 @@ class _SignInState extends State<SignIn> {
                       ),
                     ),
                   ),
-                ),
+                ), // submit button
                 Container(
                   width: size['register_w'] * width,
                   height: size['register_h'] * height,
@@ -145,7 +175,7 @@ class _SignInState extends State<SignIn> {
                       ),
                     ),
                   ),
-                ),
+                ), // register switch
               ],
             ),
           ),
