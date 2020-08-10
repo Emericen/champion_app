@@ -4,6 +4,9 @@ import 'package:champion_app/classes/champion.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Selection extends StatefulWidget {
+  final Database connection;
+  Selection({this.connection});
+
   @override
   _SelectionState createState() => _SelectionState();
 }
@@ -15,14 +18,8 @@ class _SelectionState extends State<Selection> {
     'avatar_r': 0.03,
   };
 
-  Map data = {};
-
-  Database connection;
-
   @override
   Widget build(BuildContext context) {
-    data = data.isNotEmpty? data : ModalRoute.of(context).settings.arguments;
-    connection = data['connection'];
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
@@ -37,21 +34,18 @@ class _SelectionState extends State<Selection> {
         leading: IconButton(
           icon: const Icon(Icons.navigate_before),
           onPressed: () {
-            Navigator.pushReplacementNamed(context, '/home', arguments: {
-              'connection': data['connection']
-            });
+            Navigator.pop(context);
           }
         ),
       ),
       body: FutureBuilder(
-        future: connection.getUnowned(),
+        future: widget.connection.getUnowned(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             List<Champion> unowned = snapshot.data;
             return ListView.builder(
               itemCount: unowned.length,
               itemBuilder: (context, index) {
-//                print(unowned.length);
                 return Container(
                   height: size['entry_h'] * height,
                   child: Center(
@@ -62,10 +56,8 @@ class _SelectionState extends State<Selection> {
                         backgroundImage: unowned[index].thumbnail,
                       ),
                       onTap: () async {
-                        await connection.ownChampion(unowned[index].objectId);
-                        Navigator.pushReplacementNamed(context, '/home', arguments: {
-                          'connection': data['connection']
-                        });
+                        await widget.connection.ownChampion(unowned[index].objectId);
+                        Navigator.pop(context);
                       },
                     ),
                   ),

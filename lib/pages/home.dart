@@ -1,9 +1,16 @@
+import 'package:champion_app/services/transition.dart';
 import 'package:flutter/material.dart';
 import 'package:champion_app/services/database.dart';
 import 'package:champion_app/classes/champion.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:champion_app/pages/authentication.dart';
+import 'package:champion_app/pages/selection.dart';
+
 
 class Home extends StatefulWidget {
+  final Database connection;
+  Home({this.connection});
+
   @override
   _HomeState createState() => _HomeState();
 }
@@ -15,15 +22,11 @@ class _HomeState extends State<Home> {
     'avatar_r': 0.03,
   };
 
-  Map data = {};
-  Database connection;
-
   List<Champion> unowned;
 
   @override
   Widget build(BuildContext context) {
-    data = data.isNotEmpty? data : ModalRoute.of(context).settings.arguments;
-    connection = data['connection'];
+
     double height = MediaQuery.of(context).size.height;
 
     return Scaffold(
@@ -31,32 +34,42 @@ class _HomeState extends State<Home> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.green,
-        title: Text(connection.currentUser['username']),
+        title: Text(widget.connection.currentUser['username']),
         centerTitle: true,
         elevation:0,
         leading: IconButton(
           icon: const Icon(Icons.navigate_before),
           onPressed: () {
-            connection.logout();
-            Navigator.pushReplacementNamed(context, '/signin', arguments: {
-              'connection': data['connection']
-            });
+            widget.connection.logout();
+            Navigator.pushReplacement(
+              context,
+              EnterExitRoute(
+                thisPage: this.widget,
+                nextPage: SignIn(connection: widget.connection),
+                newPageDirection: Offset(-1,0)
+              )
+            );
           }
         ),
         actions: <Widget>[
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/selection', arguments: {
-                'connection': data['connection']
-              });
+              Navigator.push(
+                context,
+                EnterRoute(
+                  thisPage: this.widget,
+                  nextPage: Selection(connection: widget.connection),
+                  newPageDirection: Offset(1, 0),
+                ),
+              );
             },
           ),
         ],
       ),
       body: Container(
         child: FutureBuilder(
-          future: connection.getOwned(),
+          future: widget.connection.getOwned(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               List<Champion> champions = snapshot.data;
@@ -71,6 +84,18 @@ class _HomeState extends State<Home> {
                         leading: CircleAvatar(
                           radius: size['avatar_r'] * height,
                           backgroundImage: champions[index].thumbnail,
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            color: Colors.grey,
+                          ),
+                          onPressed: () async {
+                            await widget.connection.deleteChampion(champions[index].objectId);
+                            setState(() {
+                              champions.removeAt(index);
+                            });
+                          },
                         ),
                       ),
                     ),

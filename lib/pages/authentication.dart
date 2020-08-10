@@ -1,15 +1,20 @@
+import 'package:champion_app/services/transition.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:champion_app/services/database.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:champion_app/pages/home.dart';
+import 'package:champion_app/pages/register.dart';
 
 class SignIn extends StatefulWidget {
+  final Database connection;
+  SignIn({this.connection});
+
   @override
   _SignInState createState() => _SignInState();
 }
 
 class _SignInState extends State<SignIn> {
-
   Map size = {
     'welcome_w':0.8,
     'welcome_h':0.15,
@@ -28,16 +33,10 @@ class _SignInState extends State<SignIn> {
     'register_h':0.07,
     'register_f':16.0,
   };
-
-  Map data = {};
   final _formKey = GlobalKey<FormState>();
-  Database connection;
-
   String username = '';
   String password = '';
-
   bool showLoading = false;
-
 
   void toggleLoadingIcon() {
     setState((){
@@ -67,8 +66,6 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    data = data.isNotEmpty? data : ModalRoute.of(context).settings.arguments;
-    connection = data['connection'];
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
 
@@ -140,16 +137,21 @@ class _SignInState extends State<SignIn> {
                     onPressed: () async {
                       if (_formKey.currentState.validate()) {
                         toggleLoadingIcon();
-                        bool result = await connection.login(username, password);
+                        bool result = await widget.connection.login(username, password);
                         if (!result) {
                           toggleLoadingIcon();
-                          _showErrorDialog();
+                          await _showErrorDialog();
                         }
                         else if (result) {
                           toggleLoadingIcon();
-                          Navigator.pushReplacementNamed(context, '/home', arguments: {
-                            'connection': connection
-                          });
+                          Navigator.pushReplacement(
+                            context,
+                            EnterExitRoute(
+                              thisPage: this.widget,
+                              nextPage: Home(connection: widget.connection),
+                              newPageDirection: Offset(0,-1)
+                            )
+                          );
                         }
                       }
                     },
@@ -182,9 +184,14 @@ class _SignInState extends State<SignIn> {
                   child: FlatButton(
                     color: Colors.white,
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/register', arguments: {
-                        'connection': connection,
-                      });
+                      Navigator.pushReplacement(
+                        context,
+                        EnterExitRoute(
+                          thisPage: this.widget,
+                          nextPage: Register(connection: widget.connection),
+                          newPageDirection: Offset(1, 0)
+                        )
+                      );
                     },
                     child: Text(
                       "Don't have an account? Sign up.",
@@ -203,3 +210,6 @@ class _SignInState extends State<SignIn> {
     );
   }
 }
+
+
+

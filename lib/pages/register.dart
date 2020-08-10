@@ -1,18 +1,20 @@
+import 'package:champion_app/services/transition.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:champion_app/services/database.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:champion_app/pages/authentication.dart';
+import 'package:champion_app/pages/Home.dart';
 
 class Register extends StatefulWidget {
+  final Database connection;
+  Register({this.connection});
+
   @override
   _RegisterState createState() => _RegisterState();
 }
 
 class _RegisterState extends State<Register> {
-
-  Map data = {};
-  Database connection;
-
   final _formKey = GlobalKey<FormState>();
   String username = '';
   String firstPassword = '';
@@ -65,12 +67,8 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
-
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-
-    data = data.isNotEmpty? data : ModalRoute.of(context).settings.arguments;
-    connection = data['connection'];
 
     return Scaffold(
       resizeToAvoidBottomPadding: false,
@@ -149,16 +147,21 @@ class _RegisterState extends State<Register> {
                     onPressed: () async {
                       if (_formKey.currentState.validate()) {
                         toggleLoadingIcon();
-                        bool result = await connection.registerUser(username, password);
+                        bool result = await widget.connection.registerUser(username, password);
                         if (result) {
-                          await connection.login(username, password);
+                          await widget.connection.login(username, password);
                           toggleLoadingIcon();
-                          Navigator.pushReplacementNamed(context, '/home', arguments: {
-                            'connection': connection
-                          });
+                          Navigator.pushReplacement(
+                            context,
+                            EnterExitRoute(
+                              thisPage: this.widget,
+                              nextPage: Home(connection: widget.connection),
+                              newPageDirection: Offset(0,-1)
+                            )
+                          );
                         } else {
                           toggleLoadingIcon();
-                          _showErrorDialog();
+                          await _showErrorDialog();
                         }
                       }
                     },
@@ -191,9 +194,14 @@ class _RegisterState extends State<Register> {
                   child: FlatButton(
                     color: Colors.white,
                     onPressed: () {
-                      Navigator.pushReplacementNamed(context, '/signin', arguments: {
-                        'connection': connection,
-                      });
+                      Navigator.pushReplacement(
+                        context,
+                        EnterExitRoute(
+                          thisPage: this.widget,
+                          nextPage: SignIn(connection: widget.connection),
+                          newPageDirection: Offset(-1, 0)
+                        )
+                      );
                     },
                     child: Text(
                       "Already have an account? Log in.",

@@ -30,7 +30,6 @@ class Database {
     }
   }
 
-
   Future<bool> login(String username, String password) async {
     LCObject user = await _getUser(username);
     if (user != null) {
@@ -49,7 +48,6 @@ class Database {
     print('logged out $username.');
   }
 
-  // pre-req: championId must be in champions list.
   void ownChampion(String championId) async {
     if (currentUser != null) {
       LCObject newOwnerShip = LCObject('Ownership');
@@ -60,6 +58,16 @@ class Database {
       print('error: please log in a user first');
       return;
     }
+  }
+
+  void deleteChampion(String championId) async {
+    LCQuery userQuery = LCQuery('Ownership');
+    userQuery.whereEqualTo('userId', _getObjectId(currentUser));
+    LCQuery championQuery = LCQuery('Ownership');
+    championQuery.whereEqualTo('championId', championId);
+    LCQuery ownershipQuery = LCQuery.and([userQuery, championQuery]);
+    List<LCObject> results = await ownershipQuery.find();
+    await results[0].delete();
   }
 
   Future<List<Champion>> getOwned() async {
@@ -106,6 +114,7 @@ class Database {
     }
     return result;
   }
+
 
 
   ////////////////////// kernel /////////////////////////////
